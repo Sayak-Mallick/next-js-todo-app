@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Modal from "@/app/components/Modal";
+
 export default function Home() {
     const [tasks, setTasks] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
@@ -68,32 +69,44 @@ export default function Home() {
             {loading ? (
                 <p>Loading...</p>
             ) : (
-                <ul>
-                    {tasks.map((task) => (
-                        <li
-                            key={task.id}
-                            className={`flex justify-between items-center ${
-                                task.completed ? "line-through" : ""
-                            }`}
-                        >
-                            <span>{task.title}</span>
-                            <div>
-                                <button
-                                    className="btn btn-primary mr-2"
-                                    onClick={() => openModal(task)}
+                <>
+                    {tasks.length === 0 ? (
+                        <p>No tasks available. Create a task to get started.</p>
+                    ) : (
+                        <ul>
+                            {tasks.map((task) => (
+                                <li
+                                    key={task.id}
+                                    className={`flex justify-between items-center ${
+                                        task.completed ? "line-through" : ""
+                                    }`}
                                 >
-                                    Edit
-                                </button>
-                                <button
-                                    className="btn btn-danger"
-                                    onClick={() => handleDelete(task.id)}
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
+                                    <span>{task.title}</span>
+                                    <div>
+                                        <button
+                                            className="btn btn-primary mr-2"
+                                            onClick={() => openModal(task)}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            className="btn btn-danger"
+                                            onClick={() => handleDelete(task.id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                    <button
+                        className="btn btn-primary mt-4"
+                        onClick={() => openModal({})}
+                    >
+                        Create Task
+                    </button>
+                </>
             )}
 
             <Modal
@@ -103,7 +116,6 @@ export default function Home() {
                 onUpdate={handleUpdate}
                 task={currentTask}
             />
-
         </div>
     );
 }

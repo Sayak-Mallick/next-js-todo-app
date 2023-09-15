@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Modal({ isOpen, onRequestClose, onCreate, onUpdate, task }) {
-    const [title, setTitle] = useState(task.title || "");
+    const [title, setTitle] = useState("");
+
+    useEffect(() => {
+        setTitle(task.title || "");
+    }, [task]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
