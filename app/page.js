@@ -9,6 +9,7 @@ export default function Home() {
     const [modalOpen, setModalOpen] = useState(false);
     const [currentTask, setCurrentTask] = useState({});
     const [loading, setLoading] = useState(true);
+    const [deleteTask, setDeleteTask] = useState(null);
 
     useEffect(() => {
         fetchTasks();
@@ -32,6 +33,7 @@ export default function Home() {
     const closeModal = () => {
         setCurrentTask({});
         setModalOpen(false);
+        setDeleteTask(null);
     };
 
     const handleCreate = async (task) => {
@@ -54,10 +56,17 @@ export default function Home() {
         }
     };
 
-    const handleDelete = async (taskId) => {
+    const handleDelete = (taskId) => {
+        const taskToDelete = tasks.find((task) => task.id === taskId);
+        setDeleteTask(taskToDelete);
+        setModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
         try {
-            await axios.delete(`http://localhost:3005/tasks/${taskId}`);
+            await axios.delete(`http://localhost:3005/tasks/${deleteTask.id}`);
             fetchTasks();
+            closeModal();
         } catch (error) {
             console.error("Error deleting task:", error);
         }
@@ -114,7 +123,9 @@ export default function Home() {
                 onRequestClose={closeModal}
                 onCreate={handleCreate}
                 onUpdate={handleUpdate}
+                onDelete={confirmDelete}
                 task={currentTask}
+                deleteTask={deleteTask}
             />
         </div>
     );

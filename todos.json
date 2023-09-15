@@ -1,12 +1,8 @@
 {
   "tasks": [
     {
-      "title": "Tas",
+      "title": "Hello world",
       "id": 1
-    },
-    {
-      "title": "hello dear",
-      "id": 2
     }
   ]
 }
