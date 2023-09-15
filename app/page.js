@@ -1,15 +1,109 @@
-import {AddTask} from "@/app/components/AddTask";
-import {TodoList} from "@/app/components/TodoList";
-import React from "react";
+"use client";
 
+import { useState, useEffect } from "react";
+import axios from "axios";
+import Modal from "@/app/components/Modal";
 export default function Home() {
-  return (
-      <main className='max-w-4xl mx-auto mt-4'>
-          <div className='text-center my-5 flex flex-col gap-4'>
-              <h1 className='text-2xl font-bold'>Todo List App</h1>
-              <AddTask />
-          </div>
-          <TodoList />
-      </main>
-  )
+    const [tasks, setTasks] = useState([]);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [currentTask, setCurrentTask] = useState({});
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchTasks();
+    }, []);
+
+    const fetchTasks = async () => {
+        try {
+            const response = await axios.get("http://localhost:3005/tasks");
+            setTasks(response.data);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error fetching tasks:", error);
+        }
+    };
+
+    const openModal = (task) => {
+        setCurrentTask(task);
+        setModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setCurrentTask({});
+        setModalOpen(false);
+    };
+
+    const handleCreate = async (task) => {
+        try {
+            await axios.post("http://localhost:3005/tasks", task);
+            fetchTasks();
+            closeModal();
+        } catch (error) {
+            console.error("Error creating task:", error);
+        }
+    };
+
+    const handleUpdate = async (task) => {
+        try {
+            await axios.put(`http://localhost:3005/tasks/${task.id}`, task);
+            fetchTasks();
+            closeModal();
+        } catch (error) {
+            console.error("Error updating task:", error);
+        }
+    };
+
+    const handleDelete = async (taskId) => {
+        try {
+            await axios.delete(`http://localhost:3005/tasks/${taskId}`);
+            fetchTasks();
+        } catch (error) {
+            console.error("Error deleting task:", error);
+        }
+    };
+
+    return (
+        <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">Task List</h1>
+            {loading ? (
+                <p>Loading...</p>
+            ) : (
+                <ul>
+                    {tasks.map((task) => (
+                        <li
+                            key={task.id}
+                            className={`flex justify-between items-center ${
+                                task.completed ? "line-through" : ""
+                            }`}
+                        >
+                            <span>{task.title}</span>
+                            <div>
+                                <button
+                                    className="btn btn-primary mr-2"
+                                    onClick={() => openModal(task)}
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={() => handleDelete(task.id)}
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            <Modal
+                isOpen={modalOpen}
+                onRequestClose={closeModal}
+                onCreate={handleCreate}
+                onUpdate={handleUpdate}
+                task={currentTask}
+            />
+
+        </div>
+    );
 }
